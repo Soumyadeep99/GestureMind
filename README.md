@@ -1,32 +1,6 @@
 # 🧠 GestureMind
 ### Real-Time ASL Sign Language Recognition — with an AI That Actually Understands You
 
-<div align="center">
-
-## 📷 Main Dashboard
-
-<p align="center">
-  <img src="images/main%20page.png" alt="Main Dashboard" width="90%">
-</p>
-
-## ✋ Live Sign Detection
-
-<p align="center">
-  <img src="images/hello.png" alt="Live Detection" width="80%">
-</p>
-
-## 💬 getting alert
-
-<p align="center">
-  <img src="images/normal.png" alt="Normal Conversation" width="80%">
-</p>
-
-## 📝 Generated Text
-
-<p align="center">
-  <img src="images/text.png" alt="Generated Text" width="80%">
-</p>
-
 
 **A hand shows up on camera. Thirty frames later, GestureMind doesn't just know what
 you signed — it knows what you meant, and if you're in trouble, it tells someone who
@@ -34,10 +8,7 @@ can help. No gloves. No app. Just a browser and a webcam.**
 
 <br/>
 
-<<<<<<< HEAD
-=======
 
->>>>>>> 8c6b89e6f (Update README and add new project images)
 </div>
 
 ---
@@ -93,8 +64,7 @@ require specialized hardware.
 
 ---
 
-<<<<<<< HEAD
-=======
+
 ## 🎬 See It In Action
 
 <!-- 📸 SCREENSHOT: Live SLR in action — person signing with landmarks overlaid -->
@@ -131,11 +101,8 @@ require specialized hardware.
 <p align="center">
   <img src="images/alert.png" alt="Emergency alert" width="80%">
 </p>
-> *Place your screenshots inside `docs/screenshots/` using the filenames above, or
-> swap in your own paths — GitHub will render them automatically once pushed.*
 
 ---
->>>>>>> 8c6b89e6f (Update README and add new project images)
 
 ## 🏗️ System Architecture
 
