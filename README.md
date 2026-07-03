@@ -89,30 +89,6 @@ require specialized hardware.
 
 ---
 
-## 🎬 See It In Action
-
-<!-- 📸 SCREENSHOT: Live SLR in action — person signing with landmarks overlaid -->
-<img src="docs/screenshots/live-slr.png" alt="Live sign detection with landmark overlay" width="90%"/>
-
-<br/><br/>
-
-<!-- 📸 SCREENSHOT: AI Assistant panel showing a formed sentence + urgency detection -->
-<img src="docs/screenshots/ai-assistant.png" alt="AI Assistant reasoning over recognized signs" width="90%"/>
-
-<br/><br/>
-
-<!-- 📸 SCREENSHOT: Gesture History panel -->
-<img src="docs/screenshots/gesture-history.png" alt="Gesture history log" width="90%"/>
-
-<br/><br/>
-
-<!-- 📸 SCREENSHOT (optional): Emergency email alert received in inbox -->
-<img src="docs/screenshots/email-alert.png" alt="Emergency alert email example" width="90%"/>
-
-> *Place your screenshots inside `docs/screenshots/` using the filenames above, or
-> swap in your own paths — GitHub will render them automatically once pushed.*
-
----
 
 ## 🏗️ System Architecture
 
