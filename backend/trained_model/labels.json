@@ -1,0 +1,30 @@
+{
+  "actions": [
+    "hello",
+    "thank_you",
+    "please",
+    "yes",
+    "no",
+    "sorry",
+    "help",
+    "good",
+    "bad",
+    "stop"
+  ],
+  "label_map": {
+    "0": "hello",
+    "1": "thank_you",
+    "2": "please",
+    "3": "yes",
+    "4": "no",
+    "5": "sorry",
+    "6": "help",
+    "7": "good",
+    "8": "bad",
+    "9": "stop"
+  },
+  "sequence_length": 30,
+  "feature_size": 1662,
+  "test_accuracy": 0.9333333373069763,
+  "test_loss": 0.2743806540966034
+}

@@ -1,0 +1,7 @@
+{
+  "sequence_length": 30,
+  "feature_size": 1662,
+  "prediction_threshold": 0.8,
+  "cooldown_frames": 20,
+  "sentence_max_words": 15
+}

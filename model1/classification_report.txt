@@ -1,0 +1,16 @@
+              precision    recall  f1-score   support
+
+       hello       0.91      0.91      0.91        22
+   thank_you       1.00      0.95      0.98        22
+      please       1.00      0.91      0.95        23
+         yes       0.92      1.00      0.96        23
+          no       0.91      0.91      0.91        23
+       sorry       0.92      1.00      0.96        22
+        help       0.96      0.96      0.96        23
+        good       0.95      0.95      0.95        22
+         bad       0.95      0.91      0.93        22
+        stop       0.96      0.96      0.96        23
+
+    accuracy                           0.95       225
+   macro avg       0.95      0.95      0.95       225
+weighted avg       0.95      0.95      0.95       225

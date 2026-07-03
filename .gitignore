@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+env310/
+venv/
+signsense_env/
+mp_env/
+*.egg-info/
+dist/
+build/
+
+# Environment — NEVER commit API keys
+.env
+*.env
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Dataset — too large for git
+MP_Data/
+
+# Model files — too large for git (host separately)
+trained_model/*.keras
+model1/*.keras
+
+# Node
+node_modules/
+frontend/build/
+npm-debug.log*
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+
+# Temporary
+*.tmp
+*.bak
+# Ignore duplicate trained model folder
+/trained_model/

@@ -1,0 +1,147 @@
+/* ── Agent Panel ──────────────────────────────────────────────────── */
+.agent-panel {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  height: 100%;
+  min-height: 300px;
+}
+
+/* Header */
+.ap-header    { padding: 12px 14px; border-bottom: 1px solid var(--border); }
+.ap-title-row { display: flex; align-items: center; justify-content: space-between; }
+.ap-title     { font-size: 11px; font-weight: 700; color: var(--cyan); letter-spacing: .09em; }
+.ap-subtitle  { font-size: 10px; color: var(--text-3); margin-top: 3px; }
+.ap-status    { display: flex; align-items: center; gap: 5px; font-family: var(--font-m); font-size: 10px; }
+.ap-status.ready  { color: var(--cyan); }
+.ap-status.offline{ color: var(--red); }
+.ap-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.ap-status.ready .ap-dot { box-shadow: 0 0 5px currentColor; animation: pulse 2s infinite; }
+
+/* Urgency alert */
+.urgency-alert {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px;
+  background: rgba(248,113,113,.15);
+  border-bottom: 1px solid rgba(248,113,113,.3);
+  color: #f87171;
+  font-size: 12px;
+  font-weight: 600;
+  animation: fadeIn .3s ease;
+}
+@keyframes fadeIn { from{opacity:0;transform:translateY(-4px)} to{opacity:1;transform:none} }
+
+/* Quick actions */
+.ap-quick { display: flex; gap: 8px; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+.ap-btn-analyze {
+  flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 8px 12px; background: var(--cyan-glow);
+  border: 1px solid var(--cyan-dim); border-radius: 6px;
+  color: var(--cyan); font-size: 12px; font-weight: 600;
+  transition: all .2s;
+}
+.ap-btn-analyze:hover:not(:disabled) { background: rgba(0,223,162,.2); }
+.ap-btn-analyze:disabled { opacity: .4; cursor: not-allowed; }
+.ap-btn-clear {
+  padding: 8px 12px; background: var(--bg-hover);
+  border: 1px solid var(--border); border-radius: 6px;
+  color: var(--text-2); font-size: 12px;
+  transition: all .15s;
+}
+.ap-btn-clear:hover { color: var(--red); border-color: rgba(248,113,113,.4); }
+
+/* Spinner */
+.ap-spinner {
+  width: 12px; height: 12px; border: 2px solid var(--cyan-glow);
+  border-top-color: var(--cyan); border-radius: 50%;
+  animation: spin .7s linear infinite; display: inline-block;
+}
+@keyframes spin { to{ transform: rotate(360deg); } }
+
+/* Chat area */
+.ap-chat {
+  flex: 1; overflow-y: auto; padding: 12px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.ap-empty { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 20px; opacity: .6; }
+.ap-empty-icon { font-size: 28px; }
+.ap-empty-text { font-size: 11px; color: var(--text-2); text-align: center; line-height: 1.6; }
+
+/* Messages */
+.msg { display: flex; }
+.msg.user  { justify-content: flex-end; }
+.msg.agent { justify-content: flex-start; }
+.msg-bubble {
+  max-width: 88%; border-radius: 10px; padding: 10px 12px;
+  font-size: 12px; line-height: 1.6;
+}
+.user-bubble  { background: rgba(14,165,233,.12); border: 1px solid rgba(14,165,233,.25); color: var(--text-1); border-radius: 10px 10px 2px 10px; }
+.agent-bubble { background: var(--bg-hover); border: 1px solid var(--border); color: var(--text-1); border-radius: 10px 10px 10px 2px; }
+.error-bubble { background: rgba(248,113,113,.1); border: 1px solid rgba(248,113,113,.3); color: #f87171; }
+
+.msg-signs-label { font-size: 10px; color: var(--blue); font-weight: 600; margin-bottom: 3px; }
+.msg-text        { color: var(--text-1); }
+
+.msg-sentence {
+  display: flex; flex-direction: column; gap: 2px;
+  background: rgba(0,223,162,.06); border-left: 2px solid var(--cyan);
+  padding: 6px 10px; border-radius: 0 6px 6px 0; margin-bottom: 8px;
+}
+.sentence-label { font-size: 9px; color: var(--cyan); font-weight: 600; letter-spacing: .08em; }
+.sentence-text  { font-size: 13px; color: var(--text-1); font-weight: 500; font-style: italic; }
+
+.msg-suggestions { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+.sug-label { font-size: 10px; color: var(--text-2); }
+.sug-chip  {
+  padding: 2px 8px; background: rgba(14,165,233,.1);
+  border: 1px solid rgba(14,165,233,.2); border-radius: 12px;
+  font-size: 10px; color: var(--blue); font-weight: 500;
+}
+
+.msg-urgency { margin-top: 6px; font-size: 11px; font-weight: 600; padding: 4px 8px; border-radius: 4px; }
+.msg-urgency.high   { background: rgba(248,113,113,.15); color: #f87171; }
+.msg-urgency.medium { background: rgba(251,191,36,.1);   color: var(--yellow); }
+
+.msg-footer   { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+.msg-time     { font-size: 9px; color: var(--text-3); font-family: var(--font-m); }
+.msg-latency  { font-size: 9px; color: var(--text-3); background: var(--bg-card); padding: 1px 5px; border-radius: 4px; }
+.msg-auto     { font-size: 9px; color: var(--cyan-dim); background: var(--cyan-glow); padding: 1px 5px; border-radius: 4px; }
+
+/* Typing indicator */
+.loading { display: flex; align-items: center; gap: 8px; }
+.typing-dots { display: flex; gap: 4px; }
+.typing-dots span {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--cyan); opacity: .4;
+  animation: blink 1.2s infinite;
+}
+.typing-dots span:nth-child(2) { animation-delay: .2s; }
+.typing-dots span:nth-child(3) { animation-delay: .4s; }
+@keyframes blink { 0%,100%{opacity:.2} 50%{opacity:1} }
+.typing-label { font-size: 11px; color: var(--text-2); }
+
+/* Input */
+.ap-input-row {
+  display: flex; gap: 8px; padding: 10px 12px;
+  border-top: 1px solid var(--border);
+}
+.ap-input {
+  flex: 1; background: var(--bg-hover); border: 1px solid var(--border);
+  border-radius: 6px; padding: 8px 12px; color: var(--text-1);
+  font-family: var(--font-b); font-size: 12px; outline: none;
+  transition: border .15s;
+}
+.ap-input::placeholder { color: var(--text-3); }
+.ap-input:focus:not(:disabled) { border-color: var(--cyan-dim); }
+.ap-input:disabled { opacity: .4; cursor: not-allowed; }
+.ap-send-btn {
+  padding: 8px 12px; background: var(--cyan-glow);
+  border: 1px solid var(--cyan-dim); border-radius: 6px;
+  color: var(--cyan); display: flex; align-items: center; justify-content: center;
+  transition: all .15s;
+}
+.ap-send-btn:hover:not(:disabled) { background: rgba(0,223,162,.2); }
+.ap-send-btn:disabled { opacity: .3; cursor: not-allowed; }
