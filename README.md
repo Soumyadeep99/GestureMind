@@ -34,6 +34,10 @@ can help. No gloves. No app. Just a browser and a webcam.**
 
 <br/>
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 8c6b89e6f (Update README and add new project images)
 </div>
 
 ---
@@ -89,6 +93,49 @@ require specialized hardware.
 
 ---
 
+<<<<<<< HEAD
+=======
+## 🎬 See It In Action
+
+<!-- 📸 SCREENSHOT: Live SLR in action — person signing with landmarks overlaid -->
+## 📷 Main Dashboard
+
+<p align="center">
+  <img src="images/main%20page.png" alt="Main Dashboard" width="90%">
+</p>
+
+## ✋ Live Sign Detection
+
+<p align="center">
+  <img src="images/hello.png" alt="Live Detection" width="80%">
+</p>
+
+<!-- 📸 SCREENSHOT: AI Assistant panel showing a formed sentence + urgency detection -->
+## 💬 Getting Urgency alert
+
+<p align="center">
+  <img src="images/normal.png" alt="Normal Conversation" width="80%">
+</p>
+
+<!-- 📸 SCREENSHOT: Gesture History panel -->
+<## 📝 Generated Text
+
+<p align="center">
+  <img src="images/text.png" alt="Generated Text" width="80%">
+</p>
+
+
+<!-- 📸 SCREENSHOT (optional): Emergency email alert received in inbox -->
+## 📝 Emergency email alert received in inbox
+
+<p align="center">
+  <img src="images/alert.png" alt="Emergency alert" width="80%">
+</p>
+> *Place your screenshots inside `docs/screenshots/` using the filenames above, or
+> swap in your own paths — GitHub will render them automatically once pushed.*
+
+---
+>>>>>>> 8c6b89e6f (Update README and add new project images)
 
 ## 🏗️ System Architecture
 
@@ -346,8 +393,11 @@ Macro Avg F1   : 0.933
 > with **perfect precision and recall** on the held-out test set.
 
 <!-- 📸 SCREENSHOT: Confusion matrix from 02_train_model.ipynb -->
-<img src="docs/screenshots/confusion-matrix.png" alt="Confusion matrix" width="70%"/>
+## 📝 Confusion matrix
 
+<p align="center">
+  <img src="images/confusion.png" alt="Confusion matrix" width="80%">
+</p>
 ---
 
 ## 🗺️ Roadmap
