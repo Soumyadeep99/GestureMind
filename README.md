@@ -15,7 +15,7 @@
   <img src="images/hello.png" alt="Live Detection" width="80%">
 </p>
 
-## 💬 Normal Conversation
+## 💬 getting alert
 
 <p align="center">
   <img src="images/normal.png" alt="Normal Conversation" width="80%">
@@ -32,12 +32,7 @@
 you signed — it knows what you meant, and if you're in trouble, it tells someone who
 can help. No gloves. No app. Just a browser and a webcam.**
 
-<br/>
 
-<!-- 📸 SCREENSHOT: Main dashboard — full UI with camera feed, recognized text, and AI panel -->
-<img src="docs/screenshots/dashboard.png" alt="GestureMind main dashboard" width="90%"/>
-
-</div>
 
 ---
 
