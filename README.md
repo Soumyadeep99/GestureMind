@@ -32,7 +32,9 @@
 you signed — it knows what you meant, and if you're in trouble, it tells someone who
 can help. No gloves. No app. Just a browser and a webcam.**
 
+<br/>
 
+</div>
 
 ---
 
