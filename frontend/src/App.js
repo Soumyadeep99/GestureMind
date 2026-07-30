@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './App.css';
 import AgentPanel from './AgentPanel';
+import { speakText } from './AgentPanel';
 
 const BACKEND_URL       = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
 const SEQUENCE_LENGTH   = 30;
@@ -348,6 +349,7 @@ export default function App() {
                 <div className="qa-row">
                   <QABtn icon={<CopyIco/>} label="COPY" sub="TEXT" onClick={copyText}/>
                   <QABtn icon={<SaveIco/>} label="SAVE" sub="TEXT" onClick={saveText}/>
+                  <QABtn icon={<SpeakIco/>} label="SPEAK" sub="OUTPUT" onClick={() => { const text = words.map(w => w.text.replace(/_/g, ' ')).join(' '); if (!text) { alert('No recognized text yet. Sign something first.'); return; } speakText(text, { rate: 1.0 }); }}/>
                   <QABtn icon={<MsgIco/>}  label="AI"   sub="ASSISTANT" onClick={()=>{}}/>
                 </div>
               </div>
@@ -599,3 +601,5 @@ const TrashIco = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="non
 const CopyIco  = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>;
 const SaveIco  = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>;
 const MsgIco   = () => <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>;
+const SpeakIco = () => ( <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"> <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/> <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/> <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/> </svg> );
+

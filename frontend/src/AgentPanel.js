@@ -1,7 +1,32 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './AgentPanel.css';
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
 
-const BACKEND_URL = 'http://localhost:8000';
+// ─────────────────────────────────────────────────────────────────────────────
+//  Voice Response — Browser Web Speech API (free, no backend needed)
+// ─────────────────────────────────────────────────────────────────────────────
+function speakText(text, { rate = 1.0, pitch = 1.0 } = {}) {
+  if (!('speechSynthesis' in window) || !text) return;
+
+  // Cancel any speech currently in progress before starting new one
+  window.speechSynthesis.cancel();
+
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.rate = rate;
+  utterance.pitch = pitch;
+  utterance.lang = 'en-US';
+
+  // Prefer an English voice if multiple are available
+  const voices = window.speechSynthesis.getVoices();
+  const preferred = voices.find(v => v.lang.startsWith('en')) || voices[0];
+  if (preferred) utterance.voice = preferred;
+
+  window.speechSynthesis.speak(utterance);
+}
+
+function stopSpeaking() {
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+}
 
 export default function AgentPanel({ recognizedWords, isRunning }) {
   const [messages, setMessages] = useState([]);
@@ -9,11 +34,12 @@ export default function AgentPanel({ recognizedWords, isRunning }) {
   const [isLoading, setIsLoading] = useState(false);
   const [urgentAlert, setUrgentAlert] = useState(null);
   const [agentReady, setAgentReady] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [voiceEnabled, setVoiceEnabled] = useState(true); // master toggle
   const chatEndRef = useRef(null);
   const lastWordsRef = useRef([]);
 
-  // Check agent availability
-  // Check agent availability — retry every 5s instead of once
+  // Check agent availability — retry every 5s
   useEffect(() => {
     const check = () => {
       fetch(`${BACKEND_URL}/health`)
@@ -31,12 +57,28 @@ export default function AgentPanel({ recognizedWords, isRunning }) {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // Track speaking state for UI indicator
+  useEffect(() => {
+    if (!('speechSynthesis' in window)) return;
+    const check = setInterval(() => {
+      setIsSpeaking(window.speechSynthesis.speaking);
+    }, 200);
+    return () => clearInterval(check);
+  }, []);
+
+  // Load voices (some browsers load them async)
+  useEffect(() => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.getVoices();
+      window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+    }
+  }, []);
+
   // ── Auto-process when new words recognized ──────────────────────────────
   useEffect(() => {
     if (!isRunning || !agentReady) return;
     if (recognizedWords.length === 0) return;
-    // Only trigger when new word added (every 3 words to avoid spam)
-    if (recognizedWords.length % 3 !== 0) return;
+    if (recognizedWords.length % 8 !== 0) return;
     const words = recognizedWords.map(w => w.text);
     if (JSON.stringify(words) === JSON.stringify(lastWordsRef.current)) return;
     lastWordsRef.current = words;
@@ -48,7 +90,6 @@ export default function AgentPanel({ recognizedWords, isRunning }) {
     if (!agentReady || isLoading) return;
     setIsLoading(true);
 
-    // Add user message to chat
     if (!isAuto) {
       setMessages(prev => [...prev, {
         role: 'user',
@@ -66,10 +107,15 @@ export default function AgentPanel({ recognizedWords, isRunning }) {
       });
       const data = await res.json();
 
-      // Urgency alert
+      // ── URGENCY ALERT + AUTO-SPEAK ────────────────────────────────────────
       if (data.urgency === 'HIGH') {
         setUrgentAlert(data.urgency_message);
         setTimeout(() => setUrgentAlert(null), 8000);
+
+        // Auto-speak urgent messages — no button click needed
+        if (voiceEnabled) {
+          speakText(data.urgency_message || data.agent_message, { rate: 1.05 });
+        }
       }
 
       setMessages(prev => [...prev, {
@@ -137,6 +183,7 @@ export default function AgentPanel({ recognizedWords, isRunning }) {
     await fetch(`${BACKEND_URL}/agent/session`, { method: 'DELETE' }).catch(() => { });
     setMessages([]);
     lastWordsRef.current = [];
+    stopSpeaking();
   };
 
   const fmtTime = (d) => d.toLocaleTimeString('en-US', {
@@ -149,9 +196,19 @@ export default function AgentPanel({ recognizedWords, isRunning }) {
       <div className="ap-header">
         <div className="ap-title-row">
           <span className="ap-title">AI ASSISTANT</span>
-          <span className={`ap-status ${agentReady ? 'ready' : 'offline'}`}>
-            <span className="ap-dot" />{agentReady ? 'AGENT READY' : 'AGENT OFFLINE'}
-          </span>
+          <div className="ap-header-right">
+            {/* Voice toggle */}
+            <button
+              className={`ap-voice-toggle ${voiceEnabled ? 'on' : 'off'}`}
+              onClick={() => { setVoiceEnabled(v => !v); if (voiceEnabled) stopSpeaking(); }}
+              title={voiceEnabled ? 'Voice responses ON — click to mute' : 'Voice responses OFF — click to unmute'}
+            >
+              {voiceEnabled ? '🔊' : '🔇'}
+            </button>
+            <span className={`ap-status ${agentReady ? 'ready' : 'offline'}`}>
+              <span className="ap-dot" />{agentReady ? 'AGENT READY' : 'AGENT OFFLINE'}
+            </span>
+          </div>
         </div>
         <div className="ap-subtitle">Gemini-powered sign language understanding</div>
       </div>
@@ -161,6 +218,7 @@ export default function AgentPanel({ recognizedWords, isRunning }) {
         <div className="urgency-alert">
           <span className="urgency-icon">⚠️</span>
           <span>{urgentAlert}</span>
+          {isSpeaking && <span className="urgency-speaking">🔊 Speaking...</span>}
         </div>
       )}
 
@@ -189,7 +247,6 @@ export default function AgentPanel({ recognizedWords, isRunning }) {
 
         {messages.map((msg, i) => (
           <div key={i} className={`msg ${msg.role}`}>
-            {/* User message */}
             {msg.role === 'user' && (
               <div className="msg-bubble user-bubble">
                 {msg.type === 'signs' && <div className="msg-signs-label">🤟 Signs detected</div>}
@@ -198,7 +255,6 @@ export default function AgentPanel({ recognizedWords, isRunning }) {
               </div>
             )}
 
-            {/* Agent response */}
             {msg.role === 'agent' && msg.type !== 'error' && (
               <div className="msg-bubble agent-bubble">
                 {msg.sentence && (
@@ -225,11 +281,18 @@ export default function AgentPanel({ recognizedWords, isRunning }) {
                   <span className="msg-time">{fmtTime(msg.timestamp)}</span>
                   {msg.latency && <span className="msg-latency">{msg.latency}ms</span>}
                   {msg.isAuto && <span className="msg-auto">auto</span>}
+                  {/* Manual speak button — reads this specific response aloud */}
+                  <button
+                    className="msg-speak-btn"
+                    onClick={() => speakText(msg.sentence || msg.content)}
+                    title="Speak this message"
+                  >
+                    🔊
+                  </button>
                 </div>
               </div>
             )}
 
-            {/* Error */}
             {msg.role === 'agent' && msg.type === 'error' && (
               <div className="msg-bubble error-bubble">
                 <span>⚠️ {msg.content}</span>
@@ -267,6 +330,9 @@ export default function AgentPanel({ recognizedWords, isRunning }) {
     </div>
   );
 }
+
+// ── Export for use in App.js "Speak Output" quick action ───────────────────
+export { speakText, stopSpeaking };
 
 const SendIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">

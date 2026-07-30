@@ -145,3 +145,29 @@
 }
 .ap-send-btn:hover:not(:disabled) { background: rgba(0,223,162,.2); }
 .ap-send-btn:disabled { opacity: .3; cursor: not-allowed; }
+
+
+
+/* ──--------------------------Voice toggle button ──────────────────────────────────────────────── */
+.ap-header-right { display: flex; align-items: center; gap: 10px; }
+.ap-voice-toggle {
+  background: none; border: 1px solid var(--border); border-radius: 6px;
+  padding: 3px 7px; font-size: 13px; line-height: 1; transition: all .15s;
+}
+.ap-voice-toggle.on  { border-color: var(--cyan-dim); background: var(--cyan-glow); }
+.ap-voice-toggle.off { opacity: .5; }
+.ap-voice-toggle:hover { border-color: var(--cyan-dim); }
+
+/* ── Speaking indicator in urgency alert ─────────────────────────────── */
+.urgency-speaking {
+  margin-left: auto; font-size: 10px; font-weight: 600;
+  color: #f87171; animation: blink 1s infinite;
+}
+
+/* ── Per-message speak button ────────────────────────────────────────── */
+.msg-speak-btn {
+  margin-left: auto; background: none; border: none;
+  font-size: 12px; opacity: .5; padding: 0 2px;
+  transition: opacity .15s;
+}
+.msg-speak-btn:hover { opacity: 1; }
