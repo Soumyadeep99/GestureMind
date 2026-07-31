@@ -23,10 +23,6 @@ build/
 # Dataset — too large for git
 MP_Data/
 
-# Model files — too large for git (host separately)
-trained_model/*.keras
-model1/*.keras
-
 # Node
 node_modules/
 frontend/build/
@@ -48,5 +44,3 @@ logs/
 # Temporary
 *.tmp
 *.bak
-# Ignore duplicate trained model folder
-/trained_model/
