@@ -1,5 +1,5 @@
 """
-GestureMind — Emergency Email Alert Module
+GestureMind— Emergency Email Alert Module
 =============================================
 Sends an email alert to a designated contact (parent/friend/caregiver)
 when the agent detects HIGH urgency (e.g. "help" sign detected).
@@ -7,7 +7,6 @@ when the agent detects HIGH urgency (e.g. "help" sign detected).
 Uses Gmail SMTP with an App Password — no paid service required.
 """
 
-import os
 import smtplib
 import logging
 import time
@@ -15,7 +14,8 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from typing import List, Optional
 
-log = logging.getLogger("gesturemind.email")
+log = logging.getLogger("GestureMind.email")
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 class EmailAlertService:
@@ -27,20 +27,22 @@ class EmailAlertService:
     """
 
     SMTP_SERVER = "smtp.gmail.com"
-    SMTP_PORT   = 587
+    SMTP_PORT = 587
     COOLDOWN_SECONDS = 120  # Don't send more than 1 alert per 2 minutes
 
     def __init__(self, sender_email: str, app_password: str, recipients: List[str]):
-        self.sender_email  = sender_email
-        self.app_password  = app_password
-        self.recipients    = [r.strip() for r in recipients if r.strip()]
-        self.last_sent_at  = 0
-        self.enabled       = bool(sender_email and app_password and self.recipients)
+        self.sender_email = sender_email
+        self.app_password = app_password
+        self.recipients = [r.strip() for r in recipients if r.strip()]
+        self.last_sent_at = 0
+
+        # Recipients are now supplied dynamically per call
+        self.enabled = bool(sender_email and app_password)
 
         if self.enabled:
-            log.info(f"Email alerts enabled. Recipients: {self.recipients}")
+            log.info("Email alerts enabled.")
         else:
-            log.warning("Email alerts disabled — missing sender, password, or recipients.")
+            log.warning("Email alerts disabled — missing sender email or app password.")
 
     def _in_cooldown(self) -> bool:
         return (time.time() - self.last_sent_at) < self.COOLDOWN_SECONDS
@@ -49,26 +51,47 @@ class EmailAlertService:
         self,
         urgency_message: str,
         signs_detected: List[str],
-        sentence: Optional[str] = None
+        sentence: Optional[str] = None,
+        recipients: Optional[List[str]] = None
     ) -> dict:
         """
         Sends an urgency alert email.
 
-        Returns:
-            dict with 'sent' (bool) and 'reason' (str) explaining outcome.
+        Parameters
+        ----------
+        recipients:
+            Optional list of recipient emails.
+            If provided, overrides self.recipients.
         """
-        if not self.enabled:
-            return {"sent": False, "reason": "Email alerts not configured."}
+
+        target_recipients = recipients if recipients else self.recipients
+
+        if not self.sender_email or not self.app_password:
+            return {
+                "sent": False,
+                "reason": "Email sender not configured (missing GMAIL_ADDRESS/APP_PASSWORD)."
+            }
+
+        if not target_recipients:
+            return {
+                "sent": False,
+                "reason": "No recipients specified."
+            }
 
         if self._in_cooldown():
-            remaining = int(self.COOLDOWN_SECONDS - (time.time() - self.last_sent_at))
-            return {"sent": False, "reason": f"Cooldown active ({remaining}s remaining)."}
+            remaining = int(
+                self.COOLDOWN_SECONDS - (time.time() - self.last_sent_at)
+            )
+            return {
+                "sent": False,
+                "reason": f"Cooldown active ({remaining}s remaining)."
+            }
 
         try:
             msg = MIMEMultipart("alternative")
             msg["Subject"] = "🚨 GestureMind Alert — User May Need Help"
-            msg["From"]    = self.sender_email
-            msg["To"]      = ", ".join(self.recipients)
+            msg["From"] = self.sender_email
+            msg["To"] = ", ".join(target_recipients)
 
             timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
             signs_str = ", ".join(signs_detected) if signs_detected else "unknown"
@@ -101,15 +124,29 @@ This is an automated message from GestureMind AI.
         <p style="font-size:14px; line-height:1.6;">
           <strong>{urgency_message}</strong>
         </p>
+
         <table style="width:100%; margin-top:16px; font-size:13px; color:#8892aa;">
-          <tr><td style="padding:6px 0;">Time</td><td style="color:#e8eaf0;">{timestamp}</td></tr>
-          <tr><td style="padding:6px 0;">Signs Detected</td><td style="color:#e8eaf0;">{signs_str}</td></tr>
-          <tr><td style="padding:6px 0;">Interpreted</td><td style="color:#e8eaf0;">{sentence or 'N/A'}</td></tr>
+          <tr>
+            <td style="padding:6px 0;">Time</td>
+            <td style="color:#e8eaf0;">{timestamp}</td>
+          </tr>
+
+          <tr>
+            <td style="padding:6px 0;">Signs Detected</td>
+            <td style="color:#e8eaf0;">{signs_str}</td>
+          </tr>
+
+          <tr>
+            <td style="padding:6px 0;">Interpreted</td>
+            <td style="color:#e8eaf0;">{sentence or 'N/A'}</td>
+          </tr>
         </table>
+
         <p style="font-size:13px; color:#8892aa; margin-top:20px;">
           Please check on them as soon as possible.
         </p>
       </div>
+
       <div style="background:#080a16; padding:12px 20px; font-size:11px; color:#4a5268;">
         Automated message from GestureMind AI — Real-Time ASL Recognition
       </div>
@@ -124,15 +161,34 @@ This is an automated message from GestureMind AI.
             with smtplib.SMTP(self.SMTP_SERVER, self.SMTP_PORT) as server:
                 server.starttls()
                 server.login(self.sender_email, self.app_password)
-                server.sendmail(self.sender_email, self.recipients, msg.as_string())
+
+                server.sendmail(
+                    self.sender_email,
+                    target_recipients,
+                    msg.as_string()
+                )
 
             self.last_sent_at = time.time()
-            log.info(f"Urgency alert email sent to {self.recipients}")
-            return {"sent": True, "reason": f"Alert sent to {len(self.recipients)} recipient(s)."}
+
+            log.info(f"Urgency alert email sent to {target_recipients}")
+
+            return {
+                "sent": True,
+                "reason": f"Alert sent to {len(target_recipients)} recipient(s)."
+            }
 
         except smtplib.SMTPAuthenticationError:
             log.error("SMTP auth failed — check Gmail App Password.")
-            return {"sent": False, "reason": "Authentication failed. Check GMAIL_APP_PASSWORD in .env"}
+
+            return {
+                "sent": False,
+                "reason": "Authentication failed. Check GMAIL_APP_PASSWORD in .env"
+            }
+
         except Exception as e:
             log.error(f"Email send failed: {e}")
-            return {"sent": False, "reason": str(e)}
+
+            return {
+                "sent": False,
+                "reason": str(e)
+            }

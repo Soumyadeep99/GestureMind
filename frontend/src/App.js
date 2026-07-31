@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './App.css';
 import AgentPanel from './AgentPanel';
 import { speakText } from './AgentPanel';
+import Login from './Login';
 
 const BACKEND_URL       = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
 const SEQUENCE_LENGTH   = 30;
@@ -39,6 +40,26 @@ export default function App() {
   const [words,          setWords]          = useState([]);
   const [gestureHistory, setGestureHistory] = useState([]);
   const [activeNav,      setActiveNav]      = useState('live');
+  const [authToken, setAuthToken] = useState(localStorage.getItem('gm_token'));
+  const [userEmail, setUserEmail] = useState(localStorage.getItem('gm_email') || '');
+
+  const handleLogin = (token, email) => {
+    setAuthToken(token);
+    setUserEmail(email);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('gm_token');
+    localStorage.removeItem('gm_email');
+    setAuthToken(null);
+    setUserEmail('');
+    stopCamera(); // stop camera/mediapipe cleanly on logout
+  };
+
+  const authHeaders = () => ({
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${authToken}`
+  });
 
   const videoRef=useRef(null), canvasRef=useRef(null), streamRef=useRef(null), animRef=useRef(null);
   const sequenceRef=useRef([]), predBufferRef=useRef([]), lastAddedRef=useRef(0), lastGestureRef=useRef('');
@@ -119,13 +140,13 @@ export default function App() {
     try{
       const controller=new AbortController(); const timeout=setTimeout(()=>controller.abort(),5000);
       const res=await fetch(`${BACKEND_URL}/predict`,{
-        method:'POST', headers:{'Content-Type':'application/json'},
+        method:'POST', headers: authHeaders(),
         body:JSON.stringify({frames:sequence.map(kp=>({keypoints:kp}))}), signal:controller.signal
       });
       clearTimeout(timeout);
       if(!res.ok)return null; return await res.json();
     }catch{return null;}
-  },[]);
+  },[authToken]);
 
   const processFrame = useCallback(()=>{
     if(!isRunningRef.current)return;
@@ -228,7 +249,7 @@ export default function App() {
     const text=words.map(w=>w.text.replace('_',' ')).join(' ');
     const blob=new Blob([text],{type:'text/plain'});
     const url=URL.createObjectURL(blob);
-    const a=document.createElement('a');a.href=url;a.download=`gesturemind_${Date.now()}.txt`;a.click();
+    const a=document.createElement('a');a.href=url;a.download=`GestureMind_${Date.now()}.txt`;a.click();
     URL.revokeObjectURL(url);
   };
 
@@ -244,7 +265,11 @@ export default function App() {
     {id:'help',label:'Help'},{id:'about',label:'About'},
   ];
 
-  return(
+  if (!authToken) {
+  return <Login onLogin={handleLogin} />;
+}
+
+  return (
     <div className="app">
       {backendError && (
         <div className="error-banner">
@@ -270,7 +295,33 @@ export default function App() {
         <div className="hdr-right">
           <div className="hdr-time">{timeStr}</div>
           <div className="hdr-date">{dateStr}</div>
-          <div className={`hdr-status ${backendReady?'on':'off'}`}><span className="hdr-dot"/>{backendReady?'ONLINE':'OFFLINE'}</div>
+
+          <div className={`hdr-status ${backendReady ? 'on' : 'off'}`}>
+            <span className="hdr-dot" />
+            {backendReady ? 'ONLINE' : 'OFFLINE'}
+          </div>
+
+          <div
+            style={{
+              color: '#00dfa2',
+              fontSize: '12px',
+              marginTop: '8px'
+            }}
+          >
+            {userEmail}
+          </div>
+
+          <button
+            onClick={handleLogout}
+            style={{
+              marginTop: '8px',
+              padding: '6px 12px',
+              borderRadius: '6px',
+              cursor: 'pointer'
+            }}
+          >
+            Logout
+          </button>
         </div>
       </header>
 
@@ -415,7 +466,7 @@ export default function App() {
                   </div>
                 </div>
               </div>
-              <AgentPanel recognizedWords={words} isRunning={isRunning}/>
+              <AgentPanel recognizedWords={words} isRunning={isRunning} token={authToken}/>
             </>
           ) : (
             <div className="rp-card history-card">
@@ -499,9 +550,177 @@ function SettingsView({ backendUrl, confThresh, modelLoaded, emailReady, appName
         ⚙️ Configuration is managed via <code>.env</code> files in the backend and frontend folders.
         Edit those files and restart the servers to apply changes.
       </div>
+      <EmergencyContactsManager token={localStorage.getItem("gm_token")} />
     </div>
   );
 }
+
+function EmergencyContactsManager({ token }) {
+  const [contacts, setContacts] = useState([]);
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
+  const loadContacts = async () => {
+  try {
+    setLoading(true);
+
+    const res = await fetch(`${BACKEND_URL}/contacts`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to load contacts");
+    }
+
+    const data = await res.json();
+    setContacts(data);
+  } catch (err) {
+    console.error(err);
+    alert("Could not load emergency contacts.");
+  } finally {
+    setLoading(false);
+  }
+};
+  useEffect(() => {
+  loadContacts();
+  }, []);
+  const addContact = async () => {
+  if (!name.trim() || !email.trim()) {
+    alert("Please fill all fields.");
+    return;
+  }
+
+  try {
+    setLoading(true);
+
+    const res = await fetch(`${BACKEND_URL}/contacts`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        name,
+        email,
+      }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      alert(err.detail || "Failed to add contact.");
+      return;
+    }
+
+    setName("");
+    setEmail("");
+    await loadContacts();
+
+  } catch (err) {
+    console.error(err);
+    alert("Error adding contact.");
+  } finally {
+    setLoading(false);
+  }
+};
+  const deleteContact = async (id) => {
+  if (!window.confirm("Delete this contact?")) return;
+
+  try {
+    setLoading(true);
+
+    const res = await fetch(`${BACKEND_URL}/contacts/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to delete contact");
+    }
+
+    await loadContacts();
+
+  } catch (err) {
+    console.error(err);
+    alert("Error deleting contact.");
+  } finally {
+    setLoading(false);
+  }
+};
+  return (
+  <div className="settings-section">
+    <h3>Emergency Contacts</h3>
+
+    <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
+      <input
+        type="text"
+        placeholder="Contact Name"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+      />
+
+      <input
+        type="email"
+        placeholder="Email Address"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
+
+      <button onClick={addContact} disabled={loading}>
+        {loading ? "Adding..." : "Add"}
+      </button>
+    </div>
+
+    <div style={{ marginTop: "20px" }}>
+      {contacts.length === 0 ? (
+        <p>No emergency contacts added.</p>
+      ) : (
+        contacts.map((contact) => (
+  <div
+    key={contact.id}
+    style={{
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      padding: "8px 0",
+      borderBottom: "1px solid #333"
+    }}
+  >
+    <div>
+      <strong>{contact.name}</strong>
+      <br />
+      {contact.email}
+    </div>
+
+    <button
+      onClick={() => deleteContact(contact.id)}
+      disabled={loading}
+      style={{
+        background: "#dc3545",
+        color: "white",
+        border: "none",
+        padding: "6px 10px",
+        borderRadius: "5px",
+        cursor: "pointer"
+      }}
+    >
+      Delete
+    </button>
+
+  </div>
+))
+      )}
+    </div>
+  </div>
+);
+}
+
+
+
+
 function SettingRow({ label, value, mono }){
   return(
     <div className="setting-row">

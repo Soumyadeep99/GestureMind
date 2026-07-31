@@ -28,7 +28,7 @@ function stopSpeaking() {
   if ('speechSynthesis' in window) window.speechSynthesis.cancel();
 }
 
-export default function AgentPanel({ recognizedWords, isRunning }) {
+export default function AgentPanel({ recognizedWords, isRunning, token }) {
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -101,10 +101,13 @@ export default function AgentPanel({ recognizedWords, isRunning }) {
 
     try {
       const res = await fetch(`${BACKEND_URL}/agent`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ words })
-      });
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ words })
+    });
       const data = await res.json();
 
       // ── URGENCY ALERT + AUTO-SPEAK ────────────────────────────────────────
@@ -152,12 +155,17 @@ export default function AgentPanel({ recognizedWords, isRunning }) {
     }]);
     setIsLoading(true);
     try {
-      const currentWords = recognizedWords.map(w => w.text);
-      const res = await fetch(`${BACKEND_URL}/agent/chat`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: msg, current_words: currentWords })
-      });
+     const res = await fetch(`${BACKEND_URL}/agent/chat`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        message: msg,
+        current_words: currentWords
+      })
+    });
       const data = await res.json();
       setMessages(prev => [...prev, {
         role: 'agent', type: 'chat', content: data.agent_message,
@@ -180,7 +188,12 @@ export default function AgentPanel({ recognizedWords, isRunning }) {
   };
 
   const clearSession = async () => {
-    await fetch(`${BACKEND_URL}/agent/session`, { method: 'DELETE' }).catch(() => { });
+    await fetch(`${BACKEND_URL}/agent/session`, {
+  method: 'DELETE',
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+}).catch(() => {});
     setMessages([]);
     lastWordsRef.current = [];
     stopSpeaking();
