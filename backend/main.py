@@ -67,8 +67,14 @@ app = FastAPI(title="GestureMind", description="Real-Time ASL Recognition + Agen
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Tighten this to your deployed frontend URL in production
-    allow_credentials=True, allow_methods=["*"], allow_headers=["*"],
+    allow_origins=[
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "https://gesture-mind-frontend.vercel.app",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 class AppState:
