@@ -4,7 +4,7 @@ import AgentPanel from './AgentPanel';
 import { speakText } from './AgentPanel';
 import Login from './Login';
 
-const BACKEND_URL       = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
+const BACKEND_URL       = process.env.REACT_APP_BACKEND_URL || 'http://3.85.135.107:8000';
 const SEQUENCE_LENGTH   = 30;
 const FEATURE_SIZE      = 1662;
 const CONFIDENCE_THRESH = 0.70;

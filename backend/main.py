@@ -49,7 +49,7 @@ Base.metadata.create_all(bind=engine)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # PROJECT_DIR  = Path(os.getenv("PROJECT_DIR", r"D:\Downloads\data_collection"))
-PROJECT_DIR = Path(__file__).resolve().parent.parent
+PROJECT_DIR = Path(__file__).resolve().parent
 MODEL_DIR    = PROJECT_DIR / "trained_model"
 MODEL_PATH   = MODEL_DIR   / "signsense_model.keras"
 LABELS_PATH  = MODEL_DIR   / "labels.json"

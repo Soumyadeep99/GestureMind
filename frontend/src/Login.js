@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './Login.css';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://3.85.135.107:8000';
 
 export default function Login({ onLogin }) {
   const [mode, setMode]         = useState('login'); // 'login' | 'signup'

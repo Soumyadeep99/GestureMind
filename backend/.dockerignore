@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+env/
+env310/
+signsense_env/
+mp_env/
+
+# Environment variables
+.env
+
+# Git
+.git
+.gitignore
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
+
+# Cache
+.pytest_cache/
+.mypy_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Temporary files
+*.tmp
+*.bak
+
+# Documentation
+README.md

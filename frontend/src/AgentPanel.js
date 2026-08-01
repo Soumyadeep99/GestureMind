@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './AgentPanel.css';
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://3.85.135.107:8000';
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  Voice Response — Browser Web Speech API (free, no backend needed)
