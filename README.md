@@ -88,7 +88,7 @@ require specialized hardware.
 </p>
 
 <!-- 📸 SCREENSHOT: Gesture History panel -->
-<## 📝 Generated Text
+## 📝 Generated Text
 
 <p align="center">
   <img src="images/text.png" alt="Generated Text" width="80%">
@@ -238,7 +238,7 @@ Right hand      : 21 × 3  = 63
 - A [Gemini API key](https://aistudio.google.com) (free tier works)
 - A Gmail account + [App Password](https://myaccount.google.com/apppasswords) (for alerts)
 ## Docker Image 
-docker pull soumyadeep75/gesturemind-backend:v2
+Run - docker pull soumyadeep75/gesturemind-backend:v2
 
 ### 1. Get the project
 ```bash
