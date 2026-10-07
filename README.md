@@ -237,6 +237,8 @@ Right hand      : 21 × 3  = 63
 - A webcam
 - A [Gemini API key](https://aistudio.google.com) (free tier works)
 - A Gmail account + [App Password](https://myaccount.google.com/apppasswords) (for alerts)
+## Docker Image 
+docker pull soumyadeep75/gesturemind-backend:v2
 
 ### 1. Get the project
 ```bash
